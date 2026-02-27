@@ -1,0 +1,161 @@
+  What pi-mono Is
+
+  It's a Claude Code-like interactive AI coding agent built as a monorepo. Think: a terminal app where you type prompts, an LLM responds, calls tools (read/write/bash files), and the whole conversation is persisted as a
+  session.
+
+  Layered architecture:
+  Interactive TUI (keyboard, rendering, overlays)
+          ↓
+  AgentSession (sessions, tools, extensions, persistence)
+          ↓
+  Agent Core (tool execution loop, state, events)
+          ↓
+  LLM abstraction (stream/complete across 15+ providers)
+          ↓
+  pi-tui (differential terminal rendering, components)
+
+  ---
+  Key Technical Concepts to Learn
+
+  1. TypeScript + ESM (Week 1–2)
+
+  - Strict mode, generics, discriminated unions, unknown vs any
+  - ES Modules (import/export, .js extensions in imports)
+  - tsconfig.json: target: ES2022, module: Node16
+  - TypeBox: runtime JSON Schema generation from TypeScript types (used for tool parameters)
+
+  Why it matters: pi-mono uses discriminated unions extensively for message types, event types, and state machines.
+
+  // Pattern used everywhere in pi-mono
+  type Message =
+    | { role: "user"; content: string }
+    | { role: "assistant"; content: string; toolCalls?: ToolCall[] }
+    | { role: "tool"; toolCallId: string; content: string };
+
+  ---
+  2. Async Patterns & Streams (Week 2–3)
+
+  - async/await, Promise, error handling
+  - Async iterables (for await...of) — how LLM streams work
+  - AbortSignal / AbortController — cancellation
+  - EventEmitter pattern
+
+  Why it matters: The entire LLM streaming pipeline is async iterables emitting events (text_delta, toolcall_start, done, etc.)
+
+  ---
+  3. Monorepo Tooling (Week 1, setup)
+
+  - npm workspaces (packages/*/)
+  - tsconfig path aliases for cross-package imports
+  - Biome (linter + formatter, replaces ESLint + Prettier)
+  - tsx for running TypeScript directly in dev
+  - vitest for testing
+
+  ---
+  4. Terminal / TUI Fundamentals (Week 3–4)
+
+  - ANSI escape codes (cursor movement, colors, clear)
+  - Raw mode (process.stdin.setRawMode(true)) — keypresses character by character
+  - process.stdout.write() vs console.log
+  - Differential rendering: track previous output, only redraw changed lines
+  - Kitty keyboard protocol (enhanced key events with modifiers)
+
+  pi-tui is custom-built — you don't need to replicate it from scratch. Start with Ink (React-based TUI), then study pi-tui source to understand the lower-level approach.
+
+  ---
+  5. Agent / Tool Calling Loop (Week 4–5)
+
+  The core agent loop is simple:
+  1. Send messages to LLM (stream response)
+  2. Collect text + tool calls from stream
+  3. Execute tool calls
+  4. Append results to messages
+  5. Repeat until stop_reason = "stop"
+
+  Learn: Anthropic SDK tool calling, TypeBox for tool parameter schemas, async tool execution.
+
+  ---
+  6. Session Persistence (Week 5–6)
+
+  File-based session storage: each action (message, tool call, model change) appended as a JSON entry. Supports branching (fork at any message) and compaction (summarize old context to fit token window).
+
+  ---
+  7. Extension / Plugin System (Week 6+)
+
+  Lifecycle hooks: BeforeAgentStart, TurnStart/End, ToolCall, SessionSwitch. Extensions can add tools, intercept results, spawn UI overlays.
+
+  ---
+  Recommended Learning Path
+
+  Stage 1 — TypeScript Foundations (2 weeks)
+
+  Goal: Comfortable with TS types, ESM, async patterns.
+
+  - Work through the https://www.typescriptlang.org/docs/handbook/intro.html
+  - Focus: generics, discriminated unions, unknown, async iterables
+  - Build: a small CLI that calls the Anthropic API and streams output to the terminal
+
+  Stage 2 — TUI Basics with Ink (1–2 weeks)
+
+  Goal: Render interactive terminal UIs without writing a renderer from scratch.
+
+  - Learn Ink (React-based TUI) — <Box>, <Text>, useInput, useApp
+  - Build: a simple menu-driven app with keyboard navigation
+
+  Stage 3 — LLM Integration (1–2 weeks)
+
+  Goal: Streaming LLM responses into your TUI.
+
+  - Study packages/ai/src/types.ts and packages/ai/src/stream.ts in pi-mono
+  - Build: a chat interface in Ink that streams LLM responses
+
+  Stage 4 — Tool Calling Agent (2 weeks)
+
+  Goal: Build the agent loop with at least read, bash, write tools.
+
+  - Study packages/agent/src/agent.ts and agent-loop.ts
+  - Study packages/coding-agent/src/core/tools/
+  - Build: a minimal agent that can read/write files and run bash commands
+
+  Stage 5 — Session Persistence (1–2 weeks)
+
+  Goal: Save and restore conversations.
+
+  - Study packages/coding-agent/src/core/session-manager.ts
+  - Build: file-based session entries with load/save
+
+  Stage 6 — Custom TUI Renderer (optional, advanced)
+
+  Goal: Understand how pi-tui's differential rendering works.
+
+  - Study packages/tui/src/tui.ts
+  - Study packages/tui/src/components/editor.ts
+  - Build: a minimal differential renderer as a learning exercise
+
+  ---
+  Where to Start Reading in pi-mono
+
+  ┌───────┬──────────────────────────────────────────────┬───────────────────────────────────────────┐
+  │ Order │                     File                     │                    Why                    │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 1     │ packages/ai/src/types.ts                     │ Foundation types — Message, Tool, Context │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 2     │ packages/ai/src/stream.ts                    │ How streaming API is called               │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 3     │ packages/agent/src/agent.ts                  │ Agent class and state                     │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 4     │ packages/agent/src/agent-loop.ts             │ The core loop                             │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 5     │ packages/coding-agent/src/core/tools/read.ts │ Simple tool example                       │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 6     │ packages/coding-agent/src/core/tools/bash.ts │ Async tool with streaming                 │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 7     │ packages/tui/src/tui.ts                      │ TUI renderer (after you understand Ink)   │
+  ├───────┼──────────────────────────────────────────────┼───────────────────────────────────────────┤
+  │ 8     │ packages/tui/src/components/editor.ts        │ Production text editor                    │
+  └───────┴──────────────────────────────────────────────┴───────────────────────────────────────────┘
+
+  ---
+  Want to start with Stage 1? I can create hands-on exercises with working code based on the patterns used in pi-mono.
+
+

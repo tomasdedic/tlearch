@@ -1,0 +1,98 @@
+[
+  {
+    "role": "user",
+    "content": "What time is it?"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"What time is it?\". I'm a simulated agent. Available tools: read_file, list_di[rs,i mg]e tY_otui maes."
+  },
+  {
+    "role": "user",
+    "content": "List the files here"
+  },
+  {
+    "role": "assistant",
+    "content": "ed: \"Read the package.json\". I'm a sim[usliamt]e dY oaug eanstk.e dA:v a\"iLliasbtl et hteo oflisl:e sr ehaedr_e"
+  },
+  {
+    "role": "user",
+    "content": "What is TypeScript?"
+  },
+  {
+    "role": "assistant",
+    "content": "ile, list_dir, get_time.[sim] You asked: \"What is TypeScript?\". I'm a simulated agent. Available tools: read_file, list_dir, get_time."
+  },
+  {
+    "role": "user",
+    "content": "What time is it?"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"What time is it?\". I'm a simulated agent. Available tools: read_file, list_di[rs,i mg]e tY_otui maes."
+  },
+  {
+    "role": "user",
+    "content": "List the files here"
+  },
+  {
+    "role": "assistant",
+    "content": "ed: \"Read the package.json\". I'm a sim[usliamt]e dY oaug eanstk.e dA:v a\"iLliasbtl et hteo oflisl:e sr ehaedr_"
+  },
+  {
+    "role": "user",
+    "content": "What is TypeScript?"
+  },
+  {
+    "role": "assistant",
+    "content": "ile, list_dir, get_time.[sim] You asked: \"What is TypeScript?\". I'm a simulated agent. Available tools: read_file, list_dir, get_time."
+  },
+  {
+    "role": "user",
+    "content": "What time is it?"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"What time is it?\". I'm a simulated agent. Available tools: read_file, list_d[isri,m ]g eYto_ut iamsek."
+  },
+  {
+    "role": "user",
+    "content": "List the files here"
+  },
+  {
+    "role": "assistant",
+    "content": "ed: \"Read the package.json\". I'm a sim[usliamt]e dY oaug eanstk.e dA:v a\"iLliasbtl et hteo oflisl:e sr ehaedr_e"
+  },
+  {
+    "role": "user",
+    "content": "What is TypeScript?"
+  },
+  {
+    "role": "assistant",
+    "content": "ile, list_dir, get_time.[sim] You asked: \"What is TypeScript?\". I'm a simulated agent. Available tools: read_file, list_dir, get_time."
+  },
+  {
+    "role": "user",
+    "content": "What time is it?"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"What time is it?\". I'm a simulated agent. Available tools: read_file, list_dir, get_time."
+  },
+  {
+    "role": "user",
+    "content": "List the files here"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"List the files here"
+  },
+  {
+    "role": "user",
+    "content": "What is TypeScript?"
+  },
+  {
+    "role": "assistant",
+    "content": "[sim] You asked: \"What is TypeScript?\". I'm a simulated agent. Available tools: read_file, list_dir, get_time."
+  }
+]
