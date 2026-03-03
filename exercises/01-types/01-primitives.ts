@@ -24,12 +24,12 @@ const maybeCount: number | undefined = undefined;
 // `unknown` is the safe alternative to `any`.
 // You must narrow it before use (unlike `any` which skips checking).
 function parseJson(raw: string): unknown {
-	return JSON.parse(raw);
+  return JSON.parse(raw);
 }
 
 // `never` means a function never returns (throws or infinite loops).
 function panic(message: string): never {
-	throw new Error(message);
+  throw new Error(message);
 }
 
 // --- 2. TYPE ALIASES ---
@@ -41,8 +41,8 @@ type ApiKey = string;
 
 // Aliases can describe object shapes too.
 type Dimensions = {
-	width: number;
-	height: number;
+  width: number;
+  height: number;
 };
 
 // --- 3. INTERFACES ---
@@ -50,34 +50,42 @@ type Dimensions = {
 // Key difference from `type`: interfaces can be extended/merged.
 
 interface Model {
-	readonly id: ModelId; // readonly — cannot be reassigned after creation
-	name: string;
-	contextWindow: TokenCount;
-	description?: string; // optional — may be undefined
+  readonly id: ModelId; // readonly — cannot be reassigned after creation
+  name: string;
+  contextWindow: TokenCount;
+  description?: string; // optional — may be undefined
 }
 
 interface ModelWithCost extends Model {
-	inputCostPerMillion: number;
-	outputCostPerMillion: number;
+  inputCostPerMillion: number;
+  outputCostPerMillion: number;
 }
 
 // --- 4. WORKING WITH THESE TYPES ---
 
 function describeModel(model: Model): string {
-	// model.id = "other"; // ERROR: Cannot assign to 'id' because it is read-only
-	const desc = model.description ?? "no description"; // ?? = nullish coalescing
-	return `${model.name} (${model.id}) — ${model.contextWindow} tokens — ${desc}`;
+  // model.id = "other"; // ERROR: Cannot assign to 'id' because it is read-only
+  const desc = model.description ?? "no description"; // ?? = nullish coalescing
+  return `${model.name} (${model.id}) — ${model.contextWindow} tokens — ${desc}`;
 }
 
-function estimateCost(model: ModelWithCost, inputTokens: number, outputTokens: number): number {
-	const inputCost = (inputTokens / 1_000_000) * model.inputCostPerMillion;
-	const outputCost = (outputTokens / 1_000_000) * model.outputCostPerMillion;
-	return inputCost + outputCost;
+function estimateCost(
+  model: ModelWithCost,
+  inputTokens: number,
+  outputTokens: number,
+): number {
+  const inputCost = (inputTokens / 1_000_000) * model.inputCostPerMillion;
+  const outputCost = (outputTokens / 1_000_000) * model.outputCostPerMillion;
+  return inputCost + outputCost;
 }
 
 // --- 5. ARRAYS AND TUPLES ---
 
-const modelIds: ModelId[] = ["claude-haiku-4-5", "claude-sonnet-4-6", "claude-opus-4-6"];
+const modelIds: ModelId[] = [
+  "claude-haiku-4-5",
+  "claude-sonnet-4-6",
+  "claude-opus-4-6",
+];
 
 // Tuple: fixed-length array with known types at each position.
 type ProviderAndModel = [string, string]; // [provider, modelId]
@@ -87,25 +95,38 @@ const [provider, modelId] = entry; // destructuring works the same
 // --- MAIN ---
 
 function main() {
-	const haiku: ModelWithCost = {
-		id: "claude-haiku-4-5",
-		name: "Claude Haiku 4.5",
-		contextWindow: 200_000,
-		description: "Fast and affordable",
-		inputCostPerMillion: 0.8,
-		outputCostPerMillion: 4.0,
-	};
+  const haiku: ModelWithCost = {
+    id: "claude-haiku-4-5",
+    name: "Claude Haiku 4.5",
+    contextWindow: 200_000,
+    description: "Fast and affordable",
+    inputCostPerMillion: 0.8,
+    outputCostPerMillion: 4.0,
+  };
 
-	console.log(describeModel(haiku));
-	console.log(`Cost for 10k in / 2k out: $${estimateCost(haiku, 10_000, 2_000).toFixed(4)}`);
-	console.log(`Models: ${modelIds.join(", ")}`);
-	console.log(`Provider: ${provider}, Model: ${modelId}`);
+  const ant: ProviderModel = {
+    id: "ant",
+    name: "pimono",
+    contextWindow: 200,
+    apiKeyEnvVar: "ss",
+    inputCostPerMillion: 0.8,
+    outputCostPerMillion: 4.0,
+  };
 
-	// unknown must be narrowed before use
-	const parsed = parseJson('{"role": "user"}');
-	if (typeof parsed === "object" && parsed !== null && "role" in parsed) {
-		console.log(`Parsed role: ${(parsed as { role: string }).role}`);
-	}
+  console.log(describeModel(haiku));
+  console.log(
+    `Cost for 10k in / 2k out: $${estimateCost(haiku, 10_000, 2_000).toFixed(4)}`,
+  );
+  console.log(`Models: ${modelIds.join(", ")}`);
+  console.log(`Provider: ${provider}, Model: ${modelId}`);
+
+  console.log(formatProviderModel(ant));
+
+  // unknown must be narrowed before use
+  const parsed = parseJson('{"role": "user"}');
+  if (typeof parsed === "object" && parsed !== null && "role" in parsed) {
+    console.log(`Parsed role: ${(parsed as { role: string }).role}`);
+  }
 }
 
 main();
@@ -123,3 +144,17 @@ main();
  *
  * 4. Create a ProviderModel object and log it.
  */
+
+type ProviderId = string;
+interface Provider {
+  readonly id: ProviderId;
+  name: string;
+  apiKeyEnvVar: string;
+  baseUrl?: string;
+}
+
+type ProviderModel = Provider & ModelWithCost;
+
+function formatProviderModel(pm: ProviderModel): string {
+  return `${pm.name} / ${pm.id} ($${pm.inputCostPerMillion.toFixed(2)}/M in)`;
+}
